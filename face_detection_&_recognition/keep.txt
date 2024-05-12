@@ -1,0 +1,162 @@
+The number of principal components: 319
+
+true label is  s1
+Best match s1 with Euclidean distance 3298.375979
+true label is  s1
+Best match s1 with Euclidean distance 3029.247431
+true label is  s10
+Best match s10 with Euclidean distance 1746.343344
+true label is  s10
+Best match s10 with Euclidean distance 3175.442360
+true label is  s11
+Best match s11 with Euclidean distance 2234.993791
+true label is  s11
+Best match s11 with Euclidean distance 2141.082114
+true label is  s12
+Best match s12 with Euclidean distance 1877.600651
+true label is  s12
+Best match s12 with Euclidean distance 1443.085719
+true label is  s13
+Best match s13 with Euclidean distance 612.444912
+true label is  s13
+Best match s13 with Euclidean distance 1982.450669
+true label is  s14
+Best match s14 with Euclidean distance 1638.073382
+true label is  s14
+Best match s14 with Euclidean distance 2136.878889
+true label is  s15
+Best match s15 with Euclidean distance 2400.934229
+true label is  s15
+Best match s15 with Euclidean distance 1184.402987
+true label is  s16
+Best match s1 with Euclidean distance 3276.925892
+true label is  s16
+Best match s16 with Euclidean distance 2969.488800
+true label is  s17
+Best match s17 with Euclidean distance 2087.457889
+true label is  s17
+Best match s17 with Euclidean distance 1415.564817
+true label is  s18
+Best match s18 with Euclidean distance 1447.169569
+true label is  s18
+Best match s18 with Euclidean distance 1479.750238
+true label is  s19
+Best match s19 with Euclidean distance 2196.633512
+true label is  s19
+Best match s15 with Euclidean distance 3397.864667
+true label is  s2
+Best match s2 with Euclidean distance 943.658463
+true label is  s2
+Best match s2 with Euclidean distance 2070.051129
+true label is  s20
+Best match s20 with Euclidean distance 2597.324149
+true label is  s20
+Best match s20 with Euclidean distance 2233.781232
+true label is  s21
+Best match s21 with Euclidean distance 1145.607663
+true label is  s21
+Best match s21 with Euclidean distance 1406.931182
+true label is  s22
+Best match s22 with Euclidean distance 1290.992141
+true label is  s22
+Best match s22 with Euclidean distance 1319.719649
+true label is  s23
+Best match s23 with Euclidean distance 839.356972
+true label is  s23
+Best match s23 with Euclidean distance 1827.107793
+true label is  s24
+Best match s24 with Euclidean distance 1331.276956
+true label is  s24
+Best match s24 with Euclidean distance 1570.799116
+true label is  s25
+Best match s25 with Euclidean distance 1855.174028
+true label is  s25
+Best match s25 with Euclidean distance 1511.607077
+true label is  s26
+Best match s26 with Euclidean distance 797.339907
+true label is  s26
+Best match s26 with Euclidean distance 1543.963866
+true label is  s27
+Best match s27 with Euclidean distance 1604.514874
+true label is  s27
+Best match s27 with Euclidean distance 1981.787034
+true label is  s28
+Best match s37 with Euclidean distance 2721.470853
+true label is  s28
+Best match s28 with Euclidean distance 2822.339909
+true label is  s29
+Best match s29 with Euclidean distance 2085.929302
+true label is  s29
+Best match s29 with Euclidean distance 2172.618300
+true label is  s3
+Best match s3 with Euclidean distance 1137.440288
+true label is  s3
+Best match s3 with Euclidean distance 1247.718964
+true label is  s30
+Best match s30 with Euclidean distance 1542.918995
+true label is  s30
+Best match s30 with Euclidean distance 1432.407927
+true label is  s31
+Best match s31 with Euclidean distance 1253.188967
+true label is  s31
+Best match s31 with Euclidean distance 1889.677704
+true label is  s32
+Best match s32 with Euclidean distance 2682.374451
+true label is  s32
+Best match s32 with Euclidean distance 1843.220305
+true label is  s33
+Best match s33 with Euclidean distance 2521.415882
+true label is  s33
+Best match s33 with Euclidean distance 1705.083416
+true label is  s34
+Best match s34 with Euclidean distance 930.851461
+true label is  s34
+Best match s34 with Euclidean distance 808.780002
+true label is  s35
+Best match s35 with Euclidean distance 1684.389792
+true label is  s35
+Best match s35 with Euclidean distance 2381.576300
+true label is  s36
+Best match s36 with Euclidean distance 1543.677202
+true label is  s36
+Best match s36 with Euclidean distance 2375.266776
+true label is  s37
+Best match s37 with Euclidean distance 2019.224122
+true label is  s37
+Best match s37 with Euclidean distance 963.807803
+true label is  s38
+Best match s38 with Euclidean distance 2256.228026
+true label is  s38
+Best match s38 with Euclidean distance 1913.529459
+true label is  s39
+Best match s39 with Euclidean distance 1113.262956
+true label is  s39
+Best match s39 with Euclidean distance 1664.873183
+true label is  s4
+Best match s4 with Euclidean distance 990.702424
+true label is  s4
+Best match s4 with Euclidean distance 1390.689459
+true label is  s40
+Best match s40 with Euclidean distance 1689.981066
+true label is  s40
+Best match s40 with Euclidean distance 2281.022111
+true label is  s5
+Best match s5 with Euclidean distance 2185.877213
+true label is  s5
+Best match s5 with Euclidean distance 1879.846066
+true label is  s6
+Best match s6 with Euclidean distance 1417.843315
+true label is  s6
+Best match s6 with Euclidean distance 1934.357225
+true label is  s7
+Best match s7 with Euclidean distance 1610.372942
+true label is  s7
+Best match s7 with Euclidean distance 1423.423256
+true label is  s8
+Best match s8 with Euclidean distance 1251.571762
+true label is  s8
+Best match s8 with Euclidean distance 2092.449167
+true label is  s9
+Best match s9 with Euclidean distance 1840.488559
+true label is  s9
+Best match s9 with Euclidean distance 1717.708763
