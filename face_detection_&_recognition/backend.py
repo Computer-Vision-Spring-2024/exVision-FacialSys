@@ -4,6 +4,8 @@ import random
 from itertools import combinations
 
 import numpy as np
+import tkinter as tk
+
 
 # To prevent conflicts with pyqt6
 os.environ["QT_API"] = "PyQt5"
@@ -25,7 +27,7 @@ from Features import *
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Circle
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageTk
 from PyQt5 import QtGui
 
 # imports
@@ -247,7 +249,7 @@ Location = NamedTuple("Location", [("top", int), ("left", int)])
 
 def resize_image_object(img, target_size):
     thumbnail_image = img.copy()
-    thumbnail_image.thumbnail(target_size, Image.LANCZOS)  # anti-alising-resize
+    thumbnail_image.thumbnail(target_size, Image.Resampling.LANCZOS)  # anti-alising-resize
     return thumbnail_image
 
 
@@ -804,9 +806,9 @@ class BackendClass(QMainWindow, Ui_MainWindow):
                 )
                 self.ui.apply_thresholding.setEnabled(True)
             elif current_tab == 11:
-                self.detection_original_image = img
+                self.detection_original_image = Image.open(file_path)
                 self.detection_thumbnail_image = resize_image_object(
-                    to_image(self.detection_original_image), (384, 288)
+                    self.detection_original_image, (384, 288)
                 )
                 self.detection_original_float = to_float_array(
                     self.detection_thumbnail_image
@@ -824,8 +826,6 @@ class BackendClass(QMainWindow, Ui_MainWindow):
                     "Input Image",
                     False,
                 )
-                plt.imshow(self.detection_original_float)
-                plt.show()
                 self.ui.apply_detection.setEnabled(True)
 
             # Deactivate the slider and disconnect from apply harris function
