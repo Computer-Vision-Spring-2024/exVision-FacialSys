@@ -9,8 +9,11 @@ import numpy as np
 os.environ["QT_API"] = "PyQt5"
 # To solve the problem of the icons with relative path
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+import os
+import pickle
 import time
 from math import cos, sin
+from typing import *
 
 import cv2
 import matplotlib.pyplot as plt
@@ -18,10 +21,11 @@ import numpy as np
 
 # in CMD: pip install qdarkstyle -> pip install pyqtdarktheme
 import qdarktheme
+from Features import *
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Circle
-from PIL import Image
+from PIL import Image, ImageOps
 from PyQt5 import QtGui
 
 # imports
@@ -232,10 +236,126 @@ def Normalized_histogram_computation(Image):
 
     return Histogram
 
+
+# Detection
+WINDOW_SIZE = 15
+
+# size and location NamedTuple objects
+Size = NamedTuple("Size", [("height", int), ("width", int)])
+Location = NamedTuple("Location", [("top", int), ("left", int)])
+
+
+def resize_image_object(img, target_size):
+    thumbnail_image = img.copy()
+    thumbnail_image.thumbnail(target_size, Image.LANCZOS)  # anti-alising-resize
+    return thumbnail_image
+
+
+def to_float_array(img):
+    return np.array(img).astype(np.float32) / 255.0  # float division
+
+
+def to_image(arr):
+    return Image.fromarray(np.uint8(arr * 255.0))
+
+
+def gamma(channel, coeff=2.2):
+    return channel ** (1.0 / coeff)
+
+
+def gleam_converion(img):
+    return np.sum(gamma(img), axis=2) / img.shape[2]  # divide by 3
+
+
+def integrate_image(img):
+    """The padding compensates for the loss that might happen in differentiation"""
+    integral = np.cumsum(np.cumsum(img, axis=0), axis=1)  # 2d integral
+    return np.pad(integral, (1, 1), "constant", constant_values=(0, 0))[:-1, :-1]
+
+
+def possible_combinations(size, window_size=WINDOW_SIZE):
+    return range(0, window_size - size + 1)  # size can be height or width
+
+
+def possible_locations(base_size: Size, window_size=WINDOW_SIZE):
+    return (
+        Location(left=x, top=y)
+        for x in possible_combinations(base_size.width, window_size)
+        for y in possible_combinations(base_size.height, window_size)
+    )
+
+
+def possible_feature_shapes(base_size: Size, window_size=WINDOW_SIZE):
+    base_height = base_size.height
+    base_width = base_size.width
+    return (
+        Size(height=height, width=width)
+        for width in range(base_width, window_size + 1, base_width)
+        for height in range(base_height, window_size + 1, base_height)
+    )
+
+
+# this is helper types
+ThresholdPolarity = NamedTuple(
+    "ThresholdPolarity", [("threshold", float), ("polarity", float)]
+)
+
+ClassifierResult = NamedTuple(
+    "ClassifierResult",
+    [
+        ("threshold", float),
+        ("polarity", int),
+        ("classification_error", float),
+        ("classifier", Callable[[np.ndarray], float]),
+    ],
+)
+
+WeakClassifier = NamedTuple(
+    "WeakClassifier",
+    [
+        ("threshold", float),
+        ("polarity", int),
+        ("alpha", float),
+        ("classifier", Callable[[np.ndarray], float]),
+    ],
+)
+
+
+def weak_classifier(
+    window: np.ndarray, feature: Feature, polarity: float, theta: float
+):
+    return (np.sign((polarity * theta) - (polarity * feature(window))) + 1) // 2
+    # computational optimization
+
+
+def run_weak_classifier(window: np.ndarray, weak_classier: WeakClassifier):
+    return weak_classifier(
+        window,
+        weak_classier.classifier,
+        weak_classier.polarity,
+        weak_classier.threshold,
+    )
+
+
+def strong_classifier(window: np.ndarray, weak_classifiers: List[WeakClassifier]):
+    sum_hypotheses = 0.0
+    sum_alpha = 0.0
+    for cl in weak_classifiers:
+        sum_hypotheses += cl.alpha * run_weak_classifier(window, cl)
+        sum_alpha += cl.alpha
+    vote = 1 if (sum_hypotheses >= 0.5 * sum_alpha) else 0
+    how_strong = sum_hypotheses - 0.5 * sum_alpha
+    return (vote, how_strong)
+
+
+def normalize(im):
+    return (im - im.mean()) / im.std()
+
+
 class PCA_class:
     """
     Principal Component Analysis (PCA) class.
-    
+
     Parameters
     ----------
     n_components : int, optional
@@ -243,17 +363,18 @@ class PCA_class:
     svd_solver : str, optional
         Solver to use for the decomposition. Currently not used.
     """
-    def __init__(self, n_components=None, svd_solver='full'):
+
+    def __init__(self, n_components=None, svd_solver="full"):
         self.n_components = n_components
         self.svd_solver = svd_solver
         self.mean = None
         self.components = None
         self.explained_variance_ratio_ = None
 
-    def fit(self, X, method='svd'):
+    def fit(self, X, method="svd"):
         """
         Fit the model with X using the specified method.
-        
+
         Parameters
         ----------
         X : array-like, shape (n_samples, n_features)
@@ -269,37 +390,54 @@ class PCA_class:
         if self.n_components is None:
             self.n_components = min(X.shape) - 1
 
-
-        if method == 'svd':
+        if method == "svd":
             # Compute SVD
             U, S, Vt = np.linalg.svd(X, full_matrices=False)  # Perform SVD on X
 
             # Compute explained variance ratio
-            explained_variance_ = (S ** 2) / (X.shape[0] - 1)  # Compute the explained variance
+            explained_variance_ = (S**2) / (
+                X.shape[0] - 1
+            )  # Compute the explained variance
             total_variance = explained_variance_.sum()  # Compute the total variance
-            explained_variance_ratio_ = explained_variance_ / total_variance  # Compute the explained variance ratio
+            explained_variance_ratio_ = (
+                explained_variance_ / total_variance
+            )  # Compute the explained variance ratio
 
-            self.components = Vt[:self.n_components]  # Keep the first n_components components
-            self.explained_variance_ratio_ = explained_variance_ratio_[:self.n_components]  # Keep the explained variance ratio for the first n_components
+            self.components = Vt[
+                : self.n_components
+            ]  # Keep the first n_components components
+            self.explained_variance_ratio_ = explained_variance_ratio_[
+                : self.n_components
+            ]  # Keep the explained variance ratio for the first n_components
 
-        elif method == 'eigen':
+        elif method == "eigen":
             # Compute covariance matrix
             covariance_matrix = np.dot(X.T, X)  # Compute the covariance matrix of X
 
             # Compute eigenvalues and eigenvectors
-            eigenvalues, eigenvectors = np.linalg.eig(covariance_matrix)  # Compute the eigenvalues and eigenvectors of the covariance matrix
+            eigenvalues, eigenvectors = np.linalg.eig(
+                covariance_matrix
+            )  # Compute the eigenvalues and eigenvectors of the covariance matrix
 
             # Sort eigenvalues and eigenvectors by decreasing eigenvalues
-            idx = eigenvalues.argsort()[::-1]  # Get the indices that would sort the eigenvalues in decreasing order
+            idx = eigenvalues.argsort()[
+                ::-1
+            ]  # Get the indices that would sort the eigenvalues in decreasing order
             eigenvalues = eigenvalues[idx]  # Sort the eigenvalues
             eigenvectors = eigenvectors[:, idx]  # Sort the eigenvectors accordingly
 
             # Compute explained variance ratio
             total_variance = eigenvalues.sum()  # Compute the total variance
-            explained_variance_ratio_ = eigenvalues / total_variance  # Compute the explained variance ratio
+            explained_variance_ratio_ = (
+                eigenvalues / total_variance
+            )  # Compute the explained variance ratio
 
-            self.components = eigenvectors[:, :self.n_components].T  # Keep the first n_components components
-            self.explained_variance_ratio_ = explained_variance_ratio_[:self.n_components]  # Keep the explained variance ratio for the first n_components
+            self.components = eigenvectors[
+                :, : self.n_components
+            ].T  # Keep the first n_components components
+            self.explained_variance_ratio_ = explained_variance_ratio_[
+                : self.n_components
+            ]  # Keep the explained variance ratio for the first n_components
 
         else:
             raise ValueError("Invalid method. Expected 'svd' or 'eigen'.")
@@ -308,12 +446,12 @@ class PCA_class:
     def project(self, X):
         """
         Apply dimensionality reduction to X.
-        
+
         Parameters
         ----------
         X : array-like, shape (n_samples, n_features)
             New data.
-            
+
         Returns
         -------
         X_new : array-like, shape (n_samples, n_components)
@@ -322,17 +460,17 @@ class PCA_class:
         X = X - self.mean  # Mean centering
         return np.dot(X, self.components.T)  # Project X onto the principal components
 
-    def fit_transform(self, X, method='svd'):
+    def fit_transform(self, X, method="svd"):
         """
         Fit the model with X and apply the dimensionality reduction on X.
-        
+
         Parameters
         ----------
         X : array-like, shape (n_samples, n_features)
             Training data.
         method : str, optional
             Method to use for the decomposition ('svd' or 'eigen').
-            
+
         Returns
         -------
         X_new : array-like, shape (n_samples, n_components)
@@ -492,27 +630,54 @@ class BackendClass(QMainWindow, Ui_MainWindow):
         self.ui.local_checkbox.stateChanged.connect(self.local_global_thresholding)
         self.ui.global_checkbox.stateChanged.connect(self.local_global_thresholding)
         self.ui.otsu_step_spinbox.setEnabled(False)
-        
+
         ### ==== PCA ==== ###
         self.PCA_test_image_index = 30
         self.PCA_weights = None
         self.PCA_eigen_faces = None
         self.face_recognition_threshold = 2900
-        # Configured by the user 
-        self.structure_number = 'one' # Dataset folder, containing subfolders named after subjects, each containing a minimum of 5 images, with extra images limited to the quantity of the smallest subject folder.
-        self.dataset_dir = 'Dataset'
+        # Configured by the user
+        self.structure_number = "one"  # Dataset folder, containing subfolders named after subjects, each containing a minimum of 5 images, with extra images limited to the quantity of the smallest subject folder.
+        self.dataset_dir = "Dataset"
         faces_train, faces_test = self.store_dataset_method_one(self.dataset_dir)
         self.train_pca(faces_train)
-        self.test_faces_list, self.test_labels_list = self.test_faces_and_labels(faces_test)
+        self.test_faces_list, self.test_labels_list = self.test_faces_and_labels(
+            faces_test
+        )
         self.ROC_curve()
-        self.display_image(convert_to_grey(self.test_faces_list[self.PCA_test_image_index]), self.ui.PCA_input_figure_canvas, "Query", True)
-        
+        self.display_image(
+            convert_to_grey(self.test_faces_list[self.PCA_test_image_index]),
+            self.ui.PCA_input_figure_canvas,
+            "Query",
+            True,
+        )
+
         # Test size is 20% by default
         # PCA cumulativa variance is 90% by default
 
-        # PCA Buttons 
+        # PCA Buttons
         self.ui.toggle.clicked.connect(self.toggle_PCA_test_image)
         self.ui.apply_PCA.clicked.connect(self.apply_PCA)
+
+        ### ==== Detection ==== ###
+        self.detection_original_image = None
+        self.detection_thumbnail_image = None
+        self.detection_original_float = None
+        self.detection_grayscale_image = None
+        self.detection_integral_image = None
+        self.ui.apply_detection.setEnabled(False)
+        self.features_per_window = self.get_number_of_features_per_window()
+        self.detection_models = self.upload_cascade_adaboost("new_model_15_window")
+        self.weak_classifiers = self.detection_models["1st"]
+        self.weak_classifiers_2 = self.detection_models["2nd"]
+        self.weak_classifiers_3 = self.detection_models["3rd"]
+        self.last_stage_threshold = 0
+        self.ui.apply_detection.clicked.connect(self.apply_face_detection)
+        self.ui.last_stage_threshold_spinbox.valueChanged.connect(
+            self.get_face_detection_parameters
+        )
+        self.last_stage_info = None
+        self.detection_output_image = None
 
         ### ==== General ==== ###
         # Connect menu action to load_image
@@ -638,6 +803,30 @@ class BackendClass(QMainWindow, Ui_MainWindow):
                     True,
                 )
                 self.ui.apply_thresholding.setEnabled(True)
+            elif current_tab == 11:
+                self.detection_original_image = img
+                self.detection_thumbnail_image = resize_image_object(
+                    to_image(self.detection_original_image), (384, 288)
+                )
+                self.detection_original_float = to_float_array(
+                    self.detection_thumbnail_image
+                )
+                self.detection_grayscale_image = gleam_converion(
+                    self.detection_original_float
+                )
+                self.detection_integral_image = integrate_image(
+                    self.detection_grayscale_image
+                )
+
+                self.display_image(
+                    self.detection_original_float,
+                    self.ui.detection_input_figure_canvas,
+                    "Input Image",
+                    False,
+                )
+                plt.imshow(self.detection_original_float)
+                plt.show()
+                self.ui.apply_detection.setEnabled(True)
 
             # Deactivate the slider and disconnect from apply harris function
             self.ui.horizontalSlider_corner_tab.setEnabled(False)
@@ -2772,6 +2961,7 @@ class BackendClass(QMainWindow, Ui_MainWindow):
         self.ui.agglo_elapsed_time.setText(
             "Elapsed Time is {:02d} minutes and {:02d} seconds".format(minutes, seconds)
         )
+
     ## ============== PCA ============== ##
     def store_dataset_method_one(self, dataset_dir):
         self.faces_train = dict()
@@ -2780,47 +2970,57 @@ class BackendClass(QMainWindow, Ui_MainWindow):
         # Initialize a variable to store the size of the first image
         self.first_image_size = None
 
-        for subject in os.listdir(dataset_dir): 
+        for subject in os.listdir(dataset_dir):
             images = []
-            if subject == 'no match':
+            if subject == "no match":
                 # Add to self.faces_test['no match']
                 subject_dir = os.path.join(dataset_dir, subject)
-                self.faces_test[subject] = [cv2.imread(os.path.join(subject_dir, filename), cv2.IMREAD_GRAYSCALE) for filename in sorted(os.listdir(subject_dir))]
+                self.faces_test[subject] = [
+                    cv2.imread(
+                        os.path.join(subject_dir, filename), cv2.IMREAD_GRAYSCALE
+                    )
+                    for filename in sorted(os.listdir(subject_dir))
+                ]
                 continue
-           
+
             # if subjcet is not 'no match'
             subject_dir = os.path.join(dataset_dir, subject)
-            
+
             for filename in sorted(os.listdir(subject_dir)):
-                image = cv2.imread(os.path.join(subject_dir, filename), cv2.IMREAD_GRAYSCALE)
-                
+                image = cv2.imread(
+                    os.path.join(subject_dir, filename), cv2.IMREAD_GRAYSCALE
+                )
+
                 # If first_image_size is None, this is the first image
                 # So, store its size and don't resize it
                 if self.first_image_size is None:
                     self.first_image_size = image.shape
-                
+
                 images.append(image)
 
             # Warning for the user that the minimum number of faces per subject is 5
-            if len(images) >= 5 :
+            if len(images) >= 5:
                 # Split the data: 80% for training, 20% for testing
                 split_index = int(len(images) * 0.8)
                 self.faces_train[subject] = images[:split_index]
                 self.faces_test[subject] = images[split_index:]
 
         # Resize images of 'no match' to match the size of the first image
-        if 'no match' in self.faces_test:
-            for i, image in enumerate(self.faces_test['no match']):
-                self.faces_test['no match'][i] = cv2.resize(image, (self.first_image_size[1], self.first_image_size[0]))
+        if "no match" in self.faces_test:
+            for i, image in enumerate(self.faces_test["no match"]):
+                self.faces_test["no match"][i] = cv2.resize(
+                    image, (self.first_image_size[1], self.first_image_size[0])
+                )
 
         return self.faces_train, self.faces_test
 
-
-    def store_dataset(self, structure_number: str = 'one', dataset_dir: str = None) -> None:
+    def store_dataset(
+        self, structure_number: str = "one", dataset_dir: str = None
+    ) -> None:
 
         # Define a dictionary that maps structure numbers to functions
         methods = {
-            'one': self.store_dataset_method_one,
+            "one": self.store_dataset_method_one,
         }
 
         # Get the function from the dictionary
@@ -2844,33 +3044,51 @@ class BackendClass(QMainWindow, Ui_MainWindow):
             self.train_faces_labels.extend([subject] * len(images))
         self.train_faces_matrix = np.array(train_faces_matrix)
         # Create instance of the class
-        pca = PCA_class().fit(self.train_faces_matrix, 'svd')
+        pca = PCA_class().fit(self.train_faces_matrix, "svd")
         sorted_eigen_values = np.sort(pca.explained_variance_ratio_)[::-1]
         cumulative_variance = np.cumsum(sorted_eigen_values)
-        # let's assume that we will consider just 90 % of variance in the data, so will consider just first 101 principal components  
-        upto_index = np.where(cumulative_variance < 0.9)[0][-1] # the last one 
+        # let's assume that we will consider just 90 % of variance in the data, so will consider just first 101 principal components
+        upto_index = np.where(cumulative_variance < 0.9)[0][-1]  # the last one
         no_principal_components = upto_index + 1
         self.PCA_eigen_faces = pca.components[:no_principal_components]
-        self.PCA_weights = self.PCA_eigen_faces @ (self.train_faces_matrix - np.mean(self.train_faces_matrix, axis=0)).transpose()
+        self.PCA_weights = (
+            self.PCA_eigen_faces
+            @ (
+                self.train_faces_matrix - np.mean(self.train_faces_matrix, axis=0)
+            ).transpose()
+        )
         return self
 
     def recognise_face(self, test_face: np.ndarray):
 
         test_face_to_recognise = test_face.copy()
         if test_face_to_recognise.shape != self.first_image_size:
-            test_face_to_recognise = cv2.resize(test_face_to_recognise, self.first_image_size)
-        test_face_to_recognise = test_face_to_recognise.reshape(1,-1)
-        test_face_weights = self.PCA_eigen_faces @ (test_face_to_recognise - np.mean(self.train_faces_matrix, axis=0)).transpose()
-        distances = np.linalg.norm(self.PCA_weights - test_face_weights, axis = 0 ) # compare row wise 
+            test_face_to_recognise = cv2.resize(
+                test_face_to_recognise, self.first_image_size
+            )
+        test_face_to_recognise = test_face_to_recognise.reshape(1, -1)
+        test_face_weights = (
+            self.PCA_eigen_faces
+            @ (
+                test_face_to_recognise - np.mean(self.train_faces_matrix, axis=0)
+            ).transpose()
+        )
+        distances = np.linalg.norm(
+            self.PCA_weights - test_face_weights, axis=0
+        )  # compare row wise
         best_match = np.argmin(distances)
-        best_match_subject, best_match_subject_distance = self.train_faces_labels[best_match] , distances[best_match]
+        best_match_subject, best_match_subject_distance = (
+            self.train_faces_labels[best_match],
+            distances[best_match],
+        )
         if best_match_subject_distance > self.face_recognition_threshold:
-            best_match_subject = 'no match'
-        else: best_match_subject = best_match_subject
-    
+            best_match_subject = "no match"
+        else:
+            best_match_subject = best_match_subject
+
         return best_match_subject, best_match_subject_distance, best_match
 
-    def test_faces_and_labels(self, test_faces_dict:dict) -> (list, list): # type: ignore
+    def test_faces_and_labels(self, test_faces_dict: dict) -> (list, list):  # type: ignore
         test_faces_dictionary = test_faces_dict.copy()
         # Flatten the test faces and create corresponding labels
         test_faces = []
@@ -2879,14 +3097,13 @@ class BackendClass(QMainWindow, Ui_MainWindow):
             for face in faces:
                 test_faces.append(face)
                 # Encode the labels, no match -> 0, otherwise -> 1
-                label = 0 if subject == 'no match' else 1
+                label = 0 if subject == "no match" else 1
                 test_labels.append(label)
         return test_faces, test_labels
 
-
     def ROC_curve(self):
         self.ui.ROC_figure.clear()
-        test_faces_list= self.test_faces_list.copy()
+        test_faces_list = self.test_faces_list.copy()
         test_labels_list = self.test_labels_list.copy()
         # Calculate the distances for each test face
         _, distances, _ = zip(*[self.recognise_face(face) for face in test_faces_list])
@@ -2919,37 +3136,192 @@ class BackendClass(QMainWindow, Ui_MainWindow):
             tpr_values.append(tpr)
             fpr_values.append(fpr)
 
-        plt.plot(fpr_values, tpr_values)
-        plt.plot([0, 0.93], [0, 1], linestyle='--')
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver Operating Characteristic (ROC) Curve')
+        ax = self.ui.ROC_figure.add_subplot(111)
+
+        # Plot onto the subplot
+        ax.plot(fpr_values, tpr_values)
+        ax.plot([0, 0.93], [0, 1], linestyle="--")
+        ax.set_xlabel("False Positive Rate")
+        ax.set_ylabel("True Positive Rate")
+        ax.set_title("Receiver Operating Characteristic (ROC) Curve")
 
         # Highlight the 2900 threshold
         threshold_2900_tpr = tpr_values[np.argmin(np.abs(thresholds - 2900))]
         threshold_2900_fpr = fpr_values[np.argmin(np.abs(thresholds - 2900))]
-        plt.scatter(threshold_2900_fpr, threshold_2900_tpr, color='red')
-        plt.text(threshold_2900_fpr, threshold_2900_tpr, 'Threshold 2900')
+        ax.scatter(threshold_2900_fpr, threshold_2900_tpr, color="red")
+        ax.text(threshold_2900_fpr, threshold_2900_tpr, "Threshold 2900")
 
         self.ui.ROC_figure_canvas.draw()
 
-    def apply_PCA(self): 
+    def apply_PCA(self):
         self.ui.PCA_output_figure.clear()
-        test_faces_list= self.test_faces_list.copy()
+        test_faces_list = self.test_faces_list.copy()
         test_labels_list = self.test_labels_list.copy()
         indx = self.PCA_test_image_index % len(test_labels_list)
-        best_match_subject, best_match_subject_distance, best_match_indx = self.recognise_face(test_faces_list[indx]) 
+        best_match_subject, best_match_subject_distance, best_match_indx = (
+            self.recognise_face(test_faces_list[indx])
+        )
         if best_match_subject_distance < self.face_recognition_threshold:
             # Visualize
-            self.display_image(self.train_faces_matrix[best_match_indx].reshape(self.first_image_size), self.ui.PCA_output_figure_canvas, f"Best match:{best_match_subject}", True)
-        else: 
-            self.display_image(np.full_like(self.train_faces_matrix[0].reshape(self.first_image_size), 255, dtype=np.uint8) , self.ui.PCA_output_figure_canvas, "No matching subject", True)
+            self.display_image(
+                self.train_faces_matrix[best_match_indx].reshape(self.first_image_size),
+                self.ui.PCA_output_figure_canvas,
+                f"Best match:{best_match_subject}",
+                True,
+            )
+        else:
+            self.display_image(
+                np.full_like(
+                    self.train_faces_matrix[0].reshape(self.first_image_size),
+                    255,
+                    dtype=np.uint8,
+                ),
+                self.ui.PCA_output_figure_canvas,
+                "No matching subject",
+                True,
+            )
         self.ui.PCA_output_figure_canvas.draw()
-        
+
     def toggle_PCA_test_image(self):
         self.ui.PCA_output_figure.clear()
         self.PCA_test_image_index += 1
-        self.display_image(convert_to_grey(self.test_faces_list[self.PCA_test_image_index]), self.ui.PCA_input_figure_canvas, "Query", True)
+        self.display_image(
+            convert_to_grey(self.test_faces_list[self.PCA_test_image_index]),
+            self.ui.PCA_input_figure_canvas,
+            "Query",
+            True,
+        )
+
+    ## ============== Detection ============== ##
+    def get_face_detection_parameters(self):
+        self.last_stage_threshold = self.ui.last_stage_threshold_spinbox.value()
+
+    def get_number_of_features_per_window(self):
+        feature2h = list(
+            Feature2h(location.left, location.top, shape.width, shape.height)
+            for shape in possible_feature_shapes(Size(1, 2), WINDOW_SIZE)
+            for location in possible_locations(shape, WINDOW_SIZE)
+        )
+        # --------------------------------------------------------------
+        feature2v = list(
+            Feature2v(location.left, location.top, shape.width, shape.height)
+            for shape in possible_feature_shapes(Size(2, 1), WINDOW_SIZE)
+            for location in possible_locations(shape, WINDOW_SIZE)
+        )
+        # --------------------------------------------------------------
+        feature3h = list(
+            Feature3h(location.left, location.top, shape.width, shape.height)
+            for shape in possible_feature_shapes(Size(1, 3), WINDOW_SIZE)
+            for location in possible_locations(shape, WINDOW_SIZE)
+        )
+        # --------------------------------------------------------------
+        feature3v = list(
+            Feature3v(location.left, location.top, shape.width, shape.height)
+            for shape in possible_feature_shapes(Size(3, 1), WINDOW_SIZE)
+            for location in possible_locations(shape, WINDOW_SIZE)
+        )
+        # ---------------------------------------------------------------
+        feature4 = list(
+            Feature4(location.left, location.top, shape.width, shape.height)
+            for shape in possible_feature_shapes(Size(2, 2), WINDOW_SIZE)
+            for location in possible_locations(shape, WINDOW_SIZE)
+        )
+
+        features_per_window = feature2h + feature2v + feature3h + feature3v + feature4
+
+        return features_per_window
+
+    def upload_cascade_adaboost(self, dir):
+        models = {"1st": list(), "2nd": list(), "3rd": list()}
+
+        for filename in os.listdir(dir):
+            if filename.endswith(".pickle"):  # Check if the file is a pickle file
+                file_path = os.path.join(dir, filename)
+                with open(file_path, "rb") as file:
+                    loaded_objects = pickle.load(file)
+                    models[filename[:3]].append(loaded_objects)
+        return models
+
+    def apply_face_detection(self):
+        self.get_face_detection_parameters()
+        rows, cols = self.detection_integral_image.shape[:2]
+        HALF_WINDOW = WINDOW_SIZE // 2
+
+        face_positions_1 = list()
+        face_positions_2 = list()
+        face_positions_3 = list()
+        face_positions_3_strength = list()
+
+        normalized_integral = integrate_image(
+            normalize(self.detection_grayscale_image)
+        )  # to reduce lighting variance
+
+        for row in range(HALF_WINDOW + 1, rows - HALF_WINDOW):
+            for col in range(HALF_WINDOW + 1, cols - HALF_WINDOW):
+                curr_window = normalized_integral[
+                    row - HALF_WINDOW - 1 : row + HALF_WINDOW + 1,
+                    col - HALF_WINDOW - 1 : col + HALF_WINDOW + 1,
+                ]
+
+                # First cascade stage
+                probably_face, _ = strong_classifier(curr_window, self.weak_classifiers)
+                if probably_face < 0.5:
+                    continue
+                face_positions_1.append((row, col))
+
+                probably_face, strength = strong_classifier(
+                    curr_window, self.weak_classifiers_2
+                )
+                if probably_face < 0.5:
+                    continue
+                face_positions_2.append((row, col))
+
+                probably_face, strength = strong_classifier(
+                    curr_window, self.weak_classifiers_3
+                )
+                if probably_face < 0.5:
+                    continue
+                face_positions_3.append((row, col))
+                face_positions_3_strength.append(strength)
+
+        self.last_stage_info = (face_positions_3, face_positions_3_strength)
+        self.truncate_candidates()
+
+    def render_candidates(self, image: Image.Image, candidates: List[Tuple[int, int]]):
+        HALF_WINDOW = WINDOW_SIZE // 2
+        canvas = to_float_array(image.copy())
+        for row, col in candidates:
+            canvas[
+                row - HALF_WINDOW - 1 : row + HALF_WINDOW, col - HALF_WINDOW - 1, :
+            ] = [1.0, 0.0, 0.0]
+            canvas[
+                row - HALF_WINDOW - 1 : row + HALF_WINDOW, col + HALF_WINDOW - 1, :
+            ] = [1.0, 0.0, 0.0]
+            canvas[
+                row - HALF_WINDOW - 1, col - HALF_WINDOW - 1 : col + HALF_WINDOW, :
+            ] = [1.0, 0.0, 0.0]
+            canvas[
+                row + HALF_WINDOW - 1, col - HALF_WINDOW - 1 : col + HALF_WINDOW, :
+            ] = [1.0, 0.0, 0.0]
+
+        self.detection_output_image = canvas
+        self.display_image(
+            self.detection_output_image,
+            self.ui.detection_output_figure_canvas,
+            "Output Image",
+            False,
+        )
+
+    def truncate_candidates(self):
+        filtered_faces = list()
+        expected_faces = np.argwhere(
+            np.array(self.last_stage_info[1]) > self.last_stage_threshold
+        )
+        for i in range(len(self.last_stage_info[0])):
+            if [i] in expected_faces:
+                filtered_faces.append(self.last_stage_info[0][i])
+
+        self.render_candidates(self.detection_thumbnail_image, filtered_faces)
 
 
 if __name__ == "__main__":
