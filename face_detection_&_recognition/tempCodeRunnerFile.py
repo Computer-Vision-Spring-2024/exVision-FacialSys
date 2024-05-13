@@ -1,1 +1,0 @@
-astype(np.uint8)

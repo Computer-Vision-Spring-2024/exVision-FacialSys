@@ -647,12 +647,14 @@ class BackendClass(QMainWindow, Ui_MainWindow):
             faces_test
         )
         self.ROC_curve()
+        self.PCA_test_img= self.test_faces_list[self.PCA_test_image_index]
         self.display_image(
-            convert_to_grey(self.test_faces_list[self.PCA_test_image_index]),
+            self.test_faces_list[self.PCA_test_image_index],
             self.ui.PCA_input_figure_canvas,
             "Query",
             True,
         )
+        
 
         # Test size is 20% by default
         # PCA cumulativa variance is 90% by default
@@ -805,6 +807,15 @@ class BackendClass(QMainWindow, Ui_MainWindow):
                     True,
                 )
                 self.ui.apply_thresholding.setEnabled(True)
+            elif current_tab == 9:
+                self.PCA_test_img= convert_to_grey(img)
+                self.display_image(
+                    self.PCA_test_img,
+                    self.ui.PCA_input_figure_canvas,
+                    "Query",
+                    True,
+                )
+                self.apply_PCA()
             elif current_tab == 11:
                 self.detection_original_image = Image.open(file_path)
                 self.detection_thumbnail_image = resize_image_object(
@@ -3155,11 +3166,10 @@ class BackendClass(QMainWindow, Ui_MainWindow):
 
     def apply_PCA(self):
         self.ui.PCA_output_figure.clear()
-        test_faces_list = self.test_faces_list.copy()
-        test_labels_list = self.test_labels_list.copy()
-        indx = self.PCA_test_image_index % len(test_labels_list)
+        test_image = self.PCA_test_img.copy()
+        
         best_match_subject, best_match_subject_distance, best_match_indx = (
-            self.recognise_face(test_faces_list[indx])
+            self.recognise_face(test_image)
         )
         if best_match_subject_distance < self.face_recognition_threshold:
             # Visualize
@@ -3185,8 +3195,11 @@ class BackendClass(QMainWindow, Ui_MainWindow):
     def toggle_PCA_test_image(self):
         self.ui.PCA_output_figure.clear()
         self.PCA_test_image_index += 1
+        test_labels_list = self.test_labels_list.copy()
+        self.PCA_test_image_index = self.PCA_test_image_index % len(test_labels_list)
+        self.PCA_test_img= self.test_faces_list[self.PCA_test_image_index]
         self.display_image(
-            convert_to_grey(self.test_faces_list[self.PCA_test_image_index]),
+            self.PCA_test_img,
             self.ui.PCA_input_figure_canvas,
             "Query",
             True,
