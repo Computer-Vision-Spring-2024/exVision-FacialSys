@@ -26,7 +26,7 @@ A Visual Historical Record of American High School Yearbooks](https://people.eec
     > It contains **37,921** pictures of frontal-facing portraits of size **$186 \times 171$** where we will assume the face to be in the center.
 
 - For the negative class ("not a face") we made use of the [Stanford Backgrounds Dataset](http://dags.stanford.edu/projects/scenedataset.html) for scene understanding.
-    > It contains **715** images of various scenes, from which we will randomly crop regions to be used as background classes. The images are approximately of size **$320 \times 240$** and do contain faces in camera-facing poses
+    > It contains **715** images of various scenes, from which we will randomly crop regions to be used as background classes. The images are approximately of size **$320 \times 240$** and do contain faces in camera-facing poses.
 ___
 
 **For a more in-depth understanding of the methodology and analysis, please refer to [Viola-Jones.ipynb](Attachments\Viola-Jones.ipynb) notebook in the attachment folder.** 
@@ -47,7 +47,7 @@ The face recognition process follows these key steps:
 
 ### Recognition Dataset
 - The dataset we used was the [ORL Database of Faces](https://cam-orl.co.uk/facedatabase.html), which is quite of age.
-  > There are ten different images of each of **40** distinct subjects. For some subjects, the images were taken at different times, varying the lighting, facial expressions and facial details. The size of each image is $92 \times 112$ pixels
+  > There are ten different images of each of **40** distinct subjects. For some subjects, the images were taken at different times, varying the lighting, facial expressions and facial details. The size of each image is $92 \times 112$ pixels.
 
 ___
 
