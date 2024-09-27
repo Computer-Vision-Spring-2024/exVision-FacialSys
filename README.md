@@ -1,4 +1,4 @@
-# FacialSys
+# exVision: FacialSys
 ## Overview
 FacialSys is a facial system that incorporates both face detection and recognition using classical computer vision techniques. The system employs the **Viola-Jones** algorithm for face detection, which leverages **integral images**, **Haar-like features**, and **cascade AdaBoost classifiers** for real-time and robust face detection. For face recognition, the system uses Principal Component Analysis **(PCA)** to extract and analyze key features from facial images, enabling efficient recognition through the **Eigenfaces** method. The application is implemented using PyQt5 for the desktop interface, providing an intuitive environment for real-time usage.
 
@@ -8,15 +8,15 @@ FacialSys is a facial system that incorporates both face detection and recogniti
 We employ the Viola-Jones object detection algorithm, which uses a cascade of classifiers boosted by the AdaBoost algorithm to efficiently detect faces in real-time. This method operates as a **three-stage** filtering process, where each stage applies progressively more complex classifiers to quickly discard regions that do not contain a face, while focusing computational resources on promising candidates.
 
 <p align="center">
-  <img src="Figs/Cascade_classifier.png" alt="Cascade Classifier" title="Cascade Classifier" width="350" />
+  <img src="README-Assets/cascade_classifier.png" alt="Cascade Classifier" title="Cascade Classifier" width="350" />
 </p>
 
 The algorithm scans the image using sliding windows of **15x15**, applying Haar-like features to each window to capture essential facial patterns, such as edges, lines, and textures. By leveraging integral images for fast computation, Viola-Jones can detect faces swiftly and accurately, even in varying lighting conditions or complex backgrounds. 
 
 <p align="center">
-  <img src="Figs/Without_detection.png" alt="Image without detection applied" title="Image without detection applied" width="200" style="display: inline-block; vertical-align: middle;" />
-  <img src="Figs/arrow-small-right.svg" alt="Apply detection model" title="Apply detection model" width="100" style="display: inline-block; vertical-align: middle;" />
-  <img src="Figs/With_detection.png" alt="Image with detection applied" title="Image with detection applied" width="200" style="display: inline-block; vertical-align: middle;" />
+  <img src="README-Assets/without_detection.png" alt="Image without detection applied" title="Image without detection applied" width="200" style="display: inline-block; vertical-align: middle;" />
+  <img src="README-Assets/arrow-small-right.svg" alt="Apply detection model" title="Apply detection model" width="100" style="display: inline-block; vertical-align: middle;" />
+  <img src="README-Assets/with_detection.png" alt="Image with detection applied" title="Image with detection applied" width="200" style="display: inline-block; vertical-align: middle;" />
 </p>
 
 
@@ -42,7 +42,7 @@ The face recognition process follows these key steps:
 4. **Recognition**: New faces (Queries) are projected into the PCA space and compared with known faces for recognition based on their similarity.
 
 <p align="center">
-  <img src="Figs/PCA.png" alt="Face recognition" title="Face recognition" width="350" />
+  <img src="README-Assets/pca_analysis.png" alt="Face recognition" title="Face recognition" width="350" />
 </p>
 
 ### Recognition Dataset
