@@ -202,11 +202,7 @@ def train_pca(faces_train):
     upto_index = np.where(cumulative_variance < 0.9)[0][-1]  # the last one
     no_principal_components = upto_index + 1
     PCA_eigen_faces = pca.components[:no_principal_components]
-    PCA_weights = (
-        PCA_eigen_faces
-        @ (
-            train_faces_matrix - np.mean(train_faces_matrix, axis=0)
-        ).transpose()
+    PCA_weights = (PCA_eigen_faces @ (train_faces_matrix - np.mean(train_faces_matrix, axis=0)).transpose()
     )
     return train_faces_matrix, train_faces_labels, PCA_weights, PCA_eigen_faces
 
@@ -220,12 +216,11 @@ def recognise_face(test_face, first_image_size ,train_faces_matrix, train_faces_
             test_face_to_recognise, first_image_size
         )
     test_face_to_recognise = test_face_to_recognise.reshape(1, -1)
-    test_face_weights = (
-        PCA_eigen_faces
-        @ (
-            test_face_to_recognise - np.mean(train_faces_matrix, axis=0)
-        ).transpose()
-    )
+    print(PCA_eigen_faces.shape)
+    print(test_face_to_recognise.shape)
+    print(np.mean(train_faces_matrix, axis=0,keepdims=True).shape)
+    test_face_weights = PCA_eigen_faces @ (test_face_to_recognise - np.mean(train_faces_matrix, axis=0)).transpose()
+    # test_face_weights = (PCA_eigen_faces @ (test_face_to_recognise - np.mean(train_faces_matrix, axis=0,keepdims=True)).transpose())
     distances = np.linalg.norm(
         PCA_weights - test_face_weights, axis=0
     )  # compare row wise

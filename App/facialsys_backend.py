@@ -47,8 +47,8 @@ class BackendClass(QMainWindow, Ui_MainWindow):
         (
             self.train_faces_matrix,
             self.train_faces_labels,
-            self.PCA_eigen_faces,
             self.PCA_weights,
+            self.PCA_eigen_faces
         ) = train_pca(self.faces_train)
         self.test_faces_list, self.test_labels_list = test_faces_and_labels(
             self.faces_test

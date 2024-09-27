@@ -27,7 +27,7 @@ A Visual Historical Record of American High School Yearbooks](https://people.eec
     > It contains **715** images of various scenes, from which we will randomly crop regions to be used as background classes. The images are approximately of size **$320 \times 240$** and do contain faces in camera-facing poses.
 ___
 
-**For a more in-depth understanding of the methodology and analysis, please refer to [Viola-Jones.ipynb](Attachments\Viola-Jones.ipynb) notebook in the attachment folder.** 
+**For a more in-depth understanding of the methodology and analysis, please refer to [Viola-Jones.ipynb](implementation_jupyter_notebooks\Viola-Jones.ipynb) notebook in the attachment folder.** 
 
 ### Face recognition
 For face recognition, we employ Principal Component Analysis (PCA), often referred to as the Eigenfaces method. PCA reduces the high dimensionality of facial images by projecting them into a lower-dimensional space while retaining the most important features.
@@ -49,8 +49,7 @@ The face recognition process follows these key steps:
 
 ___
 
-**For a more in-depth understanding of the methodology and analysis, please refer to [PCA_analysis.ipynb](Attachments\PCA_analysis.ipynb) & [Face_recognition.ipynb](Attachments\Face_recognition.ipynb) notebooks in the attachment folder.** 
-
+**For a more in-depth understanding of the methodology and analysis, please refer to [PCA_analysis.ipynb](implementation_jupyter_notebooks\PCA_analysis.ipynb) & [Face_recognition.ipynb](implementation_jupyter_notebooks\Face_recognition.ipynb) notebooks in the attachment folder.** 
 
 
 ## Acknowledgments
