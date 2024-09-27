@@ -1,17 +1,19 @@
+import sys
+
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1101, 732)
+    def setupUi(self, FacialSys):
+        FacialSys.setObjectName("MainWindow")
+        FacialSys.resize(1101, 732)
         font = QtGui.QFont()
         font.setFamily("Montserrat")
         font.setPointSize(12)
-        MainWindow.setFont(font)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        FacialSys.setFont(font)
+        self.centralwidget = QtWidgets.QWidget(FacialSys)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -21,25 +23,25 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.tabWidget)
 
         # PCA
-        self.tab_10 = QtWidgets.QWidget()
-        self.tab_10.setObjectName("tab_10")
-        self.verticalLayout_14 = QtWidgets.QVBoxLayout(self.tab_10)
+        self.pca_tab = QtWidgets.QWidget()
+        self.pca_tab.setObjectName("tab_10")
+        self.verticalLayout_14 = QtWidgets.QVBoxLayout(self.pca_tab)
         self.verticalLayout_14.setObjectName("verticalLayout_14")
         self.horizontalLayout_37 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_37.setObjectName("horizontalLayout_37")
-        self.PCA_input = QtWidgets.QFrame(self.tab_10)
+        self.PCA_input = QtWidgets.QFrame(self.pca_tab)
         self.PCA_input.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.PCA_input.setFrameShadow(QtWidgets.QFrame.Raised)
         self.PCA_input.setObjectName("PCA_input")
         self.horizontalLayout_37.addWidget(self.PCA_input)
-        self.PCA_output = QtWidgets.QFrame(self.tab_10)
+        self.PCA_output = QtWidgets.QFrame(self.pca_tab)
         self.PCA_output.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.PCA_output.setFrameShadow(QtWidgets.QFrame.Raised)
         self.PCA_output.setObjectName("PCA_output")
         self.horizontalLayout_37.addWidget(self.PCA_output)
         self.verticalLayout_14.addLayout(self.horizontalLayout_37)
         self.horizontalLayout_40 = QtWidgets.QHBoxLayout()
-        self.toggle = QtWidgets.QPushButton(self.tab_10)
+        self.toggle = QtWidgets.QPushButton(self.pca_tab)
         self.toggle.setObjectName("toggle")
         self.horizontalLayout_40.addWidget(self.toggle)
         spacerItem5 = QtWidgets.QSpacerItem(
@@ -47,23 +49,11 @@ class Ui_MainWindow(object):
         )
         self.horizontalLayout_40.addItem(spacerItem5)
 
-        self.apply_PCA = QtWidgets.QPushButton(self.tab_10)
+        self.apply_PCA = QtWidgets.QPushButton(self.pca_tab)
         self.apply_PCA.setObjectName("apply_PCA")
         self.horizontalLayout_40.addWidget(self.apply_PCA)
         self.verticalLayout_14.addLayout(self.horizontalLayout_40)
-        self.tabWidget.addTab(self.tab_10, "")
-
-        # PCA ROC
-        self.tab_11 = QtWidgets.QWidget()
-        self.tab_11.setObjectName("tab_11")
-        self.ROC_gridLayout = QtWidgets.QGridLayout(self.tab_11)
-        self.ROC_gridLayout.setObjectName("ROC_gridLayout")
-        self.ROC = QtWidgets.QFrame(self.tab_11)
-        self.ROC.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.ROC.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.ROC.setObjectName("ROC")
-        self.ROC_gridLayout.addWidget(self.ROC, 0, 0, 1, 1)
-        self.tabWidget.addTab(self.tab_11, "")
+        self.tabWidget.addTab(self.pca_tab, "")
 
         # Detection
         self.tab_12 = QtWidgets.QWidget()
@@ -103,21 +93,34 @@ class Ui_MainWindow(object):
         self.verticalLayout_15.addLayout(self.detection_inputs_HLayout)
         self.tabWidget.addTab(self.tab_12, "")
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        FacialSys.setCentralWidget(self.centralwidget)
+
+        ## Menu Bar
+        self.menubar = QtWidgets.QMenuBar(FacialSys)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1101, 28))
         self.menubar.setObjectName("menubar")
+        FacialSys.setMenuBar(self.menubar)
+
+        ## Status Bar
+        self.statusbar = QtWidgets.QStatusBar(FacialSys)
+        self.statusbar.setObjectName("statusbar")
+        FacialSys.setStatusBar(self.statusbar)
+
+        ### File Menu
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.actionLoad_Image = QtWidgets.QAction(MainWindow)
-        self.actionLoad_Image.setShortcut("Ctrl+I")
-        self.actionLoad_Image.setObjectName("actionLoad_Image")
-        self.menuFile.addAction(self.actionLoad_Image)
         self.menubar.addAction(self.menuFile.menuAction())
+        #### Load Image
+        self.actionImport_Image = QtWidgets.QAction(FacialSys)
+        self.actionImport_Image.setShortcut("Ctrl+I")
+        self.actionImport_Image.setObjectName("actionLoad_Image")
+        self.menuFile.addAction(self.actionImport_Image)
+        #### Exit app
+        self.actionExit = QtWidgets.QAction(FacialSys)
+        self.actionExit.setObjectName("actionExit")
+        self.actionExit.setShortcut("Ctrl+Q")
+        self.actionExit.triggered.connect(self.exit_application)
+        self.menuFile.addAction(self.actionExit)
 
         ## PCA Input
         self.PCA_input_vlayout = QtWidgets.QHBoxLayout(self.PCA_input)
@@ -131,12 +134,6 @@ class Ui_MainWindow(object):
         self.PCA_output_figure = plt.figure()
         self.PCA_output_figure_canvas = FigureCanvas(self.PCA_output_figure)
         self.PCA_output_vlayout.addWidget(self.PCA_output_figure_canvas)
-        ## PCA ROC
-        self.ROC_vlayout = QtWidgets.QHBoxLayout(self.ROC)
-        self.ROC_vlayout.setObjectName("ROC_hlayout")
-        self.ROC_figure = plt.figure()
-        self.ROC_figure_canvas = FigureCanvas(self.ROC_figure)
-        self.ROC_vlayout.addWidget(self.ROC_figure_canvas)
         ## End of PCA
 
         ## Detection Input
@@ -144,6 +141,9 @@ class Ui_MainWindow(object):
         self.detection_input_vlayout.setObjectName("detection_input_vlayout")
         self.detection_input_figure = plt.figure()
         self.detection_input_figure_canvas = FigureCanvas(self.detection_input_figure)
+        self.detection_input_figure_canvas.figure.subplots_adjust(
+            left=0, right=1, bottom=0.05, top=0.95
+        )
         self.detection_input_vlayout.addWidget(self.detection_input_figure_canvas)
         ## Detection Output
         self.detection_output_vlayout = QtWidgets.QHBoxLayout(
@@ -152,12 +152,15 @@ class Ui_MainWindow(object):
         self.detection_output_vlayout.setObjectName("detection_output_vlayout")
         self.detection_output_figure = plt.figure()
         self.detection_output_figure_canvas = FigureCanvas(self.detection_output_figure)
+        self.detection_output_figure_canvas.figure.subplots_adjust(
+            left=0, right=1, bottom=0, top=1
+        )
         self.detection_output_vlayout.addWidget(self.detection_output_figure_canvas)
         ## End of Detection
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(FacialSys)
         self.tabWidget.setCurrentIndex(11)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(FacialSys)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -166,15 +169,11 @@ class Ui_MainWindow(object):
         font_global_thresholds_label = QtGui.QFont()
         font_global_thresholds_label.setPointSize(14)
         self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_10),
+            self.tabWidget.indexOf(self.pca_tab),
             _translate("MainWindow", "PCA"),
         )
         self.toggle.setText(_translate("MainWindow", "Toggle Query"))
         self.apply_PCA.setText(_translate("MainWindow", "Apply"))
-        self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_11),
-            _translate("MainWindow", "ROC"),
-        )
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.tab_12),
             _translate("MainWindow", "Face Detection"),
@@ -184,7 +183,11 @@ class Ui_MainWindow(object):
         )
         self.apply_detection.setText(_translate("MainWindow", "Apply"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.actionLoad_Image.setText(_translate("MainWindow", "Load Image"))
+        self.actionImport_Image.setText(_translate("MainWindow", "Import Image"))
+        self.actionExit.setText(_translate("MainWindow", "Exit app"))
+
+    def exit_application(self):
+        sys.exit()
 
 
 class OddSpinBox(QtWidgets.QSpinBox):

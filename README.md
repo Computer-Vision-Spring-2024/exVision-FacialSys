@@ -14,9 +14,7 @@ We employ the Viola-Jones object detection algorithm, which uses a cascade of cl
 The algorithm scans the image using sliding windows of **15x15**, applying Haar-like features to each window to capture essential facial patterns, such as edges, lines, and textures. By leveraging integral images for fast computation, Viola-Jones can detect faces swiftly and accurately, even in varying lighting conditions or complex backgrounds. 
 
 <p align="center">
-  <img src="README-Assets/without_detection.png" alt="Image without detection applied" title="Image without detection applied" width="200" style="display: inline-block; vertical-align: middle;" />
-  <img src="README-Assets/arrow-small-right.svg" alt="Apply detection model" title="Apply detection model" width="100" style="display: inline-block; vertical-align: middle;" />
-  <img src="README-Assets/with_detection.png" alt="Image with detection applied" title="Image with detection applied" width="200" style="display: inline-block; vertical-align: middle;" />
+  <img src="README-Assets/detection_preview.png" alt="preview of the face detection" width="200" style="display: inline-block; vertical-align: middle;" />
 </p>
 
 
