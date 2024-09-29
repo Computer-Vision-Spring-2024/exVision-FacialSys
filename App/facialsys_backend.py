@@ -7,7 +7,6 @@ os.environ["QT_API"] = "PyQt5"
 # To solve the problem of the icons with relative path
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import os
-from math import cos, sin
 from typing import *
 
 import cv2
@@ -22,8 +21,6 @@ from PyQt5 import QtGui
 
 # imports
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow, QMessageBox
-from scipy.signal import convolve2d
-from skimage.transform import rescale, resize
 from utils.detection_utils import *
 from utils.helper_functions import *
 from utils.recognition_utils import *

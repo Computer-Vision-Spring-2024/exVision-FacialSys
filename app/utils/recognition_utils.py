@@ -1,6 +1,7 @@
-import numpy as np 
-import cv2 
-import os 
+import os
+
+import cv2
+import numpy as np
 
 
 class PCA_class:
@@ -131,7 +132,6 @@ class PCA_class:
         return self.transform(X)  # Apply the dimensionality reduction on X
 
 
-
 def store_dataset_method_one(dataset_dir):
     faces_train = dict()
     faces_test = dict()
@@ -145,9 +145,7 @@ def store_dataset_method_one(dataset_dir):
             # Add to self.faces_test['no match']
             subject_dir = os.path.join(dataset_dir, subject)
             faces_test[subject] = [
-                cv2.imread(
-                    os.path.join(subject_dir, filename), cv2.IMREAD_GRAYSCALE
-                )
+                cv2.imread(os.path.join(subject_dir, filename), cv2.IMREAD_GRAYSCALE)
                 for filename in sorted(os.listdir(subject_dir))
             ]
             continue
@@ -184,8 +182,7 @@ def store_dataset_method_one(dataset_dir):
     return faces_train, faces_test, first_image_size
 
 
-
-def train_pca(faces_train): 
+def train_pca(faces_train):
     faces_train_pca = faces_train.copy()
     # Use list comprehension to flatten images and create labels
     train_faces_matrix = []
@@ -202,24 +199,34 @@ def train_pca(faces_train):
     upto_index = np.where(cumulative_variance < 0.9)[0][-1]  # the last one
     no_principal_components = upto_index + 1
     PCA_eigen_faces = pca.components[:no_principal_components]
-    PCA_weights = (PCA_eigen_faces @ (train_faces_matrix - np.mean(train_faces_matrix, axis=0)).transpose()
+    PCA_weights = (
+        PCA_eigen_faces
+        @ (train_faces_matrix - np.mean(train_faces_matrix, axis=0)).transpose()
     )
     return train_faces_matrix, train_faces_labels, PCA_weights, PCA_eigen_faces
 
 
-
-def recognise_face(test_face, first_image_size ,train_faces_matrix, train_faces_labels, PCA_weights, PCA_eigen_faces, face_recognition_threshold):
+def recognise_face(
+    test_face,
+    first_image_size,
+    train_faces_matrix,
+    train_faces_labels,
+    PCA_weights,
+    PCA_eigen_faces,
+    face_recognition_threshold,
+):
 
     test_face_to_recognise = test_face.copy()
     if test_face_to_recognise.shape != first_image_size:
-        test_face_to_recognise = cv2.resize(
-            test_face_to_recognise, first_image_size
-        )
+        test_face_to_recognise = cv2.resize(test_face_to_recognise, first_image_size)
     test_face_to_recognise = test_face_to_recognise.reshape(1, -1)
-    print(PCA_eigen_faces.shape)
-    print(test_face_to_recognise.shape)
-    print(np.mean(train_faces_matrix, axis=0,keepdims=True).shape)
-    test_face_weights = PCA_eigen_faces @ (test_face_to_recognise - np.mean(train_faces_matrix, axis=0)).transpose()
+    # print(PCA_eigen_faces.shape)
+    # print(test_face_to_recognise.shape)
+    # print(np.mean(train_faces_matrix, axis=0,keepdims=True).shape)
+    test_face_weights = (
+        PCA_eigen_faces
+        @ (test_face_to_recognise - np.mean(train_faces_matrix, axis=0)).transpose()
+    )
     # test_face_weights = (PCA_eigen_faces @ (test_face_to_recognise - np.mean(train_faces_matrix, axis=0,keepdims=True)).transpose())
     distances = np.linalg.norm(
         PCA_weights - test_face_weights, axis=0
