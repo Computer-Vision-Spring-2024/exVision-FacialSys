@@ -27,7 +27,7 @@ A Visual Historical Record of American High School Yearbooks](https://people.eec
     > It contains **715** images of various scenes, from which we will randomly crop regions to be used as background classes. The images are approximately of size **$320 \times 240$** and do contain faces in camera-facing poses.
 ___
 
-**For a more in-depth understanding of the methodology and analysis, please refer to [Viola-Jones.ipynb](implementation_jupyter_notebooks\Viola-Jones.ipynb) notebook in the attachment folder.** 
+**For a more in-depth understanding of the methodology and analysis, please refer to [Viola-Jones.ipynb](implementation_jupyter_notebooks/Viola-Jones.ipynb) notebook in the attachment folder.** 
 
 ### Face recognition
 For face recognition, we employ Principal Component Analysis (PCA), often referred to as the Eigenfaces method. PCA reduces the high dimensionality of facial images by projecting them into a lower-dimensional space while retaining the most important features.
@@ -45,17 +45,17 @@ The face recognition process follows these key steps:
 
 ### Recognition Dataset
 - The dataset we used was the [ORL Database of Faces](https://cam-orl.co.uk/facedatabase.html), which is quite of age.
-  > There are ten different images of each of **40** distinct subjects. For some subjects, the images were taken at different times, varying the lighting, facial expressions and facial details. The size of each image is $92 \times 112$ pixels.
+
+    > There are ten different images of each of **40** distinct subjects. For some subjects, the images were taken at different times, varying the lighting, facial expressions and facial details. The size of each image is $92 \times 112$ pixels.
 
 ___
 
-**For a more in-depth understanding of the methodology and analysis, please refer to [PCA_analysis.ipynb](implementation_jupyter_notebooks\PCA_analysis.ipynb) & [Face_recognition.ipynb](implementation_jupyter_notebooks\Face_recognition.ipynb) notebooks in the attachment folder.** 
+**For a more in-depth understanding of the methodology and analysis, please refer to [PCA_analysis.ipynb](implementation_jupyter_notebooks/PCA_analysis.ipynb) & [Face_recognition.ipynb](implementation_jupyter_notebooks/Face_recognition.ipynb) notebooks in the attachment folder.** 
 
 
 ## Acknowledgments
 
-- This project was supervised by [Dr. Ahmed Badawi](https://www.linkedin.com/in/ahmed-badawi-215167a/), who provided invaluable guidance and expertise throughout such incredible journey as part of computer vision course at Cairo University Faculty of Engineering.
-
+- Refer to [this organization's README](https://github.com/Computer-Vision-Spring-2024#acknowledgements) repo for more details about contributors and supervisors.
 - This [blog post](https://machinelearningmastery.com/face-recognition-using-principal-component-analysis/) was inspiring in face detection using PCA.
 
 
@@ -63,7 +63,7 @@ ___
 
 If you're interested in learning more about the algorithms used in this project, you can refer to the following papers:
 
-- Viola, P., & Jones, M. (2001). **Rapid Object Detection using a Boosted Cascade of Simple Features**. [Link to paper](https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/viola-cvpr-01.pdf).
+- Viola, P., & Jones, M. (2001). **Rapid Object Detection using a Boosted Cascade of Simple Features**, Available online [here](https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/viola-cvpr-01.pdf).
 
-- Kanan, C., & Cottrell, G. W. (2009). **Color-to-Grayscale: Does the Method Matter in Image Recognition?** Department of Computer Science and Engineering, University of California San Diego, La Jolla, California, United States of America. [Link to paper](https://doi.org/10.1371/journal.pone.0029740).
+- Kanan, C., & Cottrell, G. W. (2009). **Color-to-Grayscale: Does the Method Matter in Image Recognition?** Department of Computer Science and Engineering, University of California San Diego, La Jolla, California, United States of America. Available online [here](https://doi.org/10.1371/journal.pone.0029740).
 
