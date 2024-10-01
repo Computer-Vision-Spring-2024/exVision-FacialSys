@@ -55,7 +55,7 @@ ___
 
 ## Acknowledgments
 
-- Refer to [this organization's README](https://github.com/Computer-Vision-Spring-2024#acknowledgements) repo for more details about contributors and supervisors.
+- Refer to [this organization's README](https://github.com/Computer-Vision-Spring-2024#acknowledgements) for more details about contributors and supervisors.
 - This [blog post](https://machinelearningmastery.com/face-recognition-using-principal-component-analysis/) was inspiring in face detection using PCA.
 
 
