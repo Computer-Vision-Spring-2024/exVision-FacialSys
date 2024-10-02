@@ -60,7 +60,7 @@ To be able to use our app, you can simply follow these steps:
 ```
 pip install -r requirements.txt
 ```
-3. Run the file with the name "facialsys_backend.py" in the [app folder](app).
+3. Run the file with the name "facialsys_backend.py" in the [app folder](app_gui).
 
 ## Acknowledgments
 
