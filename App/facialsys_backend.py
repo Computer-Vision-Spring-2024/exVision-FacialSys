@@ -15,7 +15,7 @@ import numpy as np
 # in CMD: pip install qdarkstyle -> pip install pyqtdarktheme
 import qdarktheme
 from facialsys_ui import Ui_MainWindow
-from features import *
+from utils.features import *
 from PIL import Image
 from PyQt5 import QtGui
 

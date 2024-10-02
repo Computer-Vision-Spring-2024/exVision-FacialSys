@@ -33,7 +33,7 @@ class FacialSys_Ui(object):
         self.organization_logo.setObjectName("organization_logo")
         self.logo_toggle_layout.addWidget(self.organization_logo)
         ### Load and set the organization logo
-        logo_pixmap = QtGui.QPixmap("app/assets/lea.jpg")
+        logo_pixmap = QtGui.QPixmap("app/assets/exVision_logo.jpg")
         scaled_pixmap = logo_pixmap.scaled(
             100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation
         )
@@ -167,16 +167,6 @@ class FacialSys_Ui(object):
             print("Recognition Mode")
         else:
             print("Detection Mode")
-
-
-class OddSpinBox(QtWidgets.QSpinBox):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.editingFinished.connect(self.adjustValue)
-
-    def adjustValue(self):
-        if self.value() % 2 == 0:
-            self.setValue(self.value() + 1)
 
 
 if __name__ == "__main__":

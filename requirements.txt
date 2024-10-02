@@ -1,0 +1,6 @@
+numpy==1.26.4
+opencv-python==4.10.0.84
+PyQt5==5.15.11
+matplotlib==3.9.0
+pyqtdarktheme==2.1.0
+pillow==10.4.0

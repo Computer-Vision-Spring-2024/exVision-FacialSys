@@ -52,6 +52,15 @@ ___
 
 **For a more in-depth understanding of the methodology and analysis, please refer to [PCA_analysis.ipynb](implementation_jupyter_notebooks/PCA_analysis.ipynb) & [Face_recognition.ipynb](implementation_jupyter_notebooks/Face_recognition.ipynb) notebooks in the attachment folder.** 
 
+## Getting Started
+
+To be able to use our app, you can simply follow these steps:
+1. Install Python3 on your device. You can download it from <a href="https://www.python.org/downloads/">here</a>.
+2. Install the required packages by the following command.
+```
+pip install -r requirements.txt
+```
+3. Run the file with the name "facialsys_backend.py" in the [app folder](app).
 
 ## Acknowledgments
 

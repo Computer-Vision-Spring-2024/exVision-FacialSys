@@ -3,8 +3,8 @@ import pickle
 from typing import *
 
 import numpy as np
-from features import *
 from PIL import Image
+from utils.features import *
 
 WINDOW_SIZE = 15
 HALF_WINDOW = WINDOW_SIZE // 2
