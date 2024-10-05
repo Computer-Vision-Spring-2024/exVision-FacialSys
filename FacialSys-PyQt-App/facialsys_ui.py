@@ -19,81 +19,11 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
-
         self.verticalLayout_2.addWidget(self.tabWidget)
-
-        # PCA
-        self.pca_tab = QtWidgets.QWidget()
-        self.pca_tab.setObjectName("tab_10")
-        self.verticalLayout_14 = QtWidgets.QVBoxLayout(self.pca_tab)
-        self.verticalLayout_14.setObjectName("verticalLayout_14")
-        self.horizontalLayout_37 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_37.setObjectName("horizontalLayout_37")
-        self.PCA_input = QtWidgets.QFrame(self.pca_tab)
-        self.PCA_input.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.PCA_input.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.PCA_input.setObjectName("PCA_input")
-        self.horizontalLayout_37.addWidget(self.PCA_input)
-        self.PCA_output = QtWidgets.QFrame(self.pca_tab)
-        self.PCA_output.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.PCA_output.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.PCA_output.setObjectName("PCA_output")
-        self.horizontalLayout_37.addWidget(self.PCA_output)
-        self.verticalLayout_14.addLayout(self.horizontalLayout_37)
-        self.horizontalLayout_40 = QtWidgets.QHBoxLayout()
-        self.toggle = QtWidgets.QPushButton(self.pca_tab)
-        self.toggle.setObjectName("toggle")
-        self.horizontalLayout_40.addWidget(self.toggle)
-        spacerItem5 = QtWidgets.QSpacerItem(
-            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
-        )
-        self.horizontalLayout_40.addItem(spacerItem5)
-
-        self.apply_PCA = QtWidgets.QPushButton(self.pca_tab)
-        self.apply_PCA.setObjectName("apply_PCA")
-        self.horizontalLayout_40.addWidget(self.apply_PCA)
-        self.verticalLayout_14.addLayout(self.horizontalLayout_40)
-        self.tabWidget.addTab(self.pca_tab, "")
-
-        # Detection
-        self.tab_12 = QtWidgets.QWidget()
-        self.tab_12.setObjectName("tab_12")
-        self.verticalLayout_15 = QtWidgets.QVBoxLayout(self.tab_12)
-        self.verticalLayout_15.setObjectName("verticalLayout_15")
-        self.detection_HLayout = QtWidgets.QHBoxLayout()
-        self.detection_HLayout.setObjectName("detection_HLayout")
-        self.detection_input_frame = QtWidgets.QFrame(self.tab_12)
-        self.detection_input_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.detection_input_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.detection_input_frame.setObjectName("detection_input_frame")
-        self.detection_HLayout.addWidget(self.detection_input_frame)
-        self.detection_output_frame = QtWidgets.QFrame(self.tab_12)
-        self.detection_output_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.detection_output_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.detection_output_frame.setObjectName("PCA_output")
-        self.detection_HLayout.addWidget(self.detection_output_frame)
-        self.verticalLayout_15.addLayout(self.detection_HLayout)
-        self.detection_inputs_HLayout = QtWidgets.QHBoxLayout()
-
-        self.last_stage_threshold_label = QtWidgets.QLabel(self.tab_12)
-        self.last_stage_threshold_label.setObjectName("last_stage_threshold_label")
-        self.detection_inputs_HLayout.addWidget(self.last_stage_threshold_label)
-
-        self.last_stage_threshold_spinbox = QtWidgets.QDoubleSpinBox(self.tab_12)
-        self.last_stage_threshold_spinbox.setObjectName("last_stage_threshold_label")
-        self.last_stage_threshold_spinbox.setValue(1)
-        self.last_stage_threshold_spinbox.setSingleStep(0.1)
-        self.last_stage_threshold_spinbox.setMinimum(0)
-        self.last_stage_threshold_spinbox.setMaximum(9)
-        self.detection_inputs_HLayout.addWidget(self.last_stage_threshold_spinbox)
-
-        self.apply_detection = QtWidgets.QPushButton(self.tab_12)
-        self.apply_detection.setObjectName("apply_detection")
-        self.detection_inputs_HLayout.addWidget(self.apply_detection)
-        self.verticalLayout_15.addLayout(self.detection_inputs_HLayout)
-        self.tabWidget.addTab(self.tab_12, "")
-
         FacialSys.setCentralWidget(self.centralwidget)
+
+        self.setup_pca_tab()
+        self.setup_face_detection_tab()
 
         ## Menu Bar
         self.menubar = QtWidgets.QMenuBar(FacialSys)
@@ -162,6 +92,79 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(11)
         QtCore.QMetaObject.connectSlotsByName(FacialSys)
 
+    def setup_face_detection_tab(self):
+        self.face_detection_tab = QtWidgets.QWidget()
+        self.face_detection_tab.setObjectName("face_detection_tab")
+        self.verticalLayout_15 = QtWidgets.QVBoxLayout(self.face_detection_tab)
+        self.verticalLayout_15.setObjectName("verticalLayout_15")
+        self.detection_HLayout = QtWidgets.QHBoxLayout()
+        self.detection_HLayout.setObjectName("detection_HLayout")
+        self.detection_input_frame = QtWidgets.QFrame(self.face_detection_tab)
+        self.detection_input_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.detection_input_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.detection_input_frame.setObjectName("detection_input_frame")
+        self.detection_HLayout.addWidget(self.detection_input_frame)
+        self.detection_output_frame = QtWidgets.QFrame(self.face_detection_tab)
+        self.detection_output_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.detection_output_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.detection_output_frame.setObjectName("PCA_output")
+        self.detection_HLayout.addWidget(self.detection_output_frame)
+        self.verticalLayout_15.addLayout(self.detection_HLayout)
+        self.detection_inputs_HLayout = QtWidgets.QHBoxLayout()
+
+        self.last_stage_threshold_label = QtWidgets.QLabel(self.face_detection_tab)
+        self.last_stage_threshold_label.setObjectName("last_stage_threshold_label")
+        self.detection_inputs_HLayout.addWidget(self.last_stage_threshold_label)
+
+        self.last_stage_threshold_spinbox = QtWidgets.QDoubleSpinBox(
+            self.face_detection_tab
+        )
+        self.last_stage_threshold_spinbox.setObjectName("last_stage_threshold_label")
+        self.last_stage_threshold_spinbox.setValue(1)
+        self.last_stage_threshold_spinbox.setSingleStep(0.1)
+        self.last_stage_threshold_spinbox.setMinimum(0)
+        self.last_stage_threshold_spinbox.setMaximum(9)
+        self.detection_inputs_HLayout.addWidget(self.last_stage_threshold_spinbox)
+
+        self.apply_detection = QtWidgets.QPushButton(self.face_detection_tab)
+        self.apply_detection.setObjectName("apply_detection")
+        self.detection_inputs_HLayout.addWidget(self.apply_detection)
+        self.verticalLayout_15.addLayout(self.detection_inputs_HLayout)
+        self.tabWidget.addTab(self.face_detection_tab, "")
+
+    def setup_pca_tab(self):
+        self.pca_tab = QtWidgets.QWidget()
+        self.pca_tab.setObjectName("tab_10")
+        self.verticalLayout_14 = QtWidgets.QVBoxLayout(self.pca_tab)
+        self.verticalLayout_14.setObjectName("verticalLayout_14")
+        self.horizontalLayout_37 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_37.setObjectName("horizontalLayout_37")
+        self.PCA_input = QtWidgets.QFrame(self.pca_tab)
+        self.PCA_input.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.PCA_input.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.PCA_input.setObjectName("PCA_input")
+        self.horizontalLayout_37.addWidget(self.PCA_input)
+        self.PCA_output = QtWidgets.QFrame(self.pca_tab)
+        self.PCA_output.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.PCA_output.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.PCA_output.setObjectName("PCA_output")
+        self.horizontalLayout_37.addWidget(self.PCA_output)
+        self.verticalLayout_14.addLayout(self.horizontalLayout_37)
+        self.horizontalLayout_40 = QtWidgets.QHBoxLayout()
+        self.toggle = QtWidgets.QPushButton(self.pca_tab)
+        self.toggle.setObjectName("toggle")
+        self.horizontalLayout_40.addWidget(self.toggle)
+        spacerItem5 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
+        self.horizontalLayout_40.addItem(spacerItem5)
+
+        self.apply_PCA = QtWidgets.QPushButton(self.pca_tab)
+        self.apply_PCA.setObjectName("apply_PCA")
+        self.horizontalLayout_40.addWidget(self.apply_PCA)
+        self.verticalLayout_14.addLayout(self.horizontalLayout_40)
+        self.tabWidget.addTab(self.pca_tab, "")
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -175,7 +178,7 @@ class Ui_MainWindow(object):
         self.toggle.setText(_translate("MainWindow", "Toggle Query"))
         self.apply_PCA.setText(_translate("MainWindow", "Apply"))
         self.tabWidget.setTabText(
-            self.tabWidget.indexOf(self.tab_12),
+            self.tabWidget.indexOf(self.face_detection_tab),
             _translate("MainWindow", "Face Detection"),
         )
         self.last_stage_threshold_label.setText(
